@@ -1,0 +1,11 @@
+[package]
+name = "sunder"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+piet = { version = "0.6.2", optional = true }
+ui-theme = { version = "0.1.0", path = "../ui-theme", optional = true }
+
+[features]
+piet = ["dep:piet", "ui-theme"]
