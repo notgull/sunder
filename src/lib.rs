@@ -91,6 +91,7 @@ pub enum Event {
 }
 
 /// Two dimensional rectangle.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Rectangle {
     /// The x coordinate of the top left corner.
     pub x: i32,

@@ -18,4 +18,6 @@
 
 //! A text label.
 
-// TODO
+pub struct Label {
+    _private: ()
+}
