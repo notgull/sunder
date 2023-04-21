@@ -80,6 +80,7 @@ impl Widget for Label<'_> {
 
     fn handle_event(&mut self, _immediate: &mut Self::Immediate<'_>, _event: crate::Event) -> bool {
         // We don't care about events.
+        // TODO: Highlighting text?
         false
     }
 }
@@ -114,5 +115,29 @@ impl<R: RenderContext + ?Sized> RenderedWidget<PietBackend<'_, R>> for Label<'_>
             .draw_text(cache.layout.as_ref().unwrap(), (0.0, 0.0));
 
         Ok(())
+    }
+}
+
+cfg_web! {
+    impl RenderedWidget<crate::web::HtmlBackend> for Label<'_> {
+        type Cache = ();
+
+        fn rectangle(
+            &mut self,
+            _: &mut Self::Cache,
+            _backend: &mut crate::web::HtmlBackend,
+        ) -> Result<crate::Size, crate::web::Error> {
+            // TODO
+            Ok(crate::Size { width: 0, height: 0 }) 
+        }
+
+        fn render(
+            &self,
+            _: &(),
+            _: &mut Self::Cache,
+            _backend: &mut crate::web::HtmlBackend,
+        ) -> Result<web_sys::Element, crate::web::Error> {
+            todo!()
+        }
     }
 }

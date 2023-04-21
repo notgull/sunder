@@ -46,10 +46,26 @@ macro_rules! cfg_piet {
     ($($i:item)*) => {};
 }
 
+#[cfg(all(target_family = "wasm", feature = "web-sys"))]
+macro_rules! cfg_web {
+    ($($i:item)*) => {
+        $($i)*
+    };
+}
+
+#[cfg(not(all(target_family = "wasm", feature = "web-sys")))]
+macro_rules! cfg_web {
+    ($($i:item)*) => {};
+}
+
 cfg_piet! {
     extern crate alloc;
 
     pub mod piet;
+}
+
+cfg_web! {
+    pub mod web;
 }
 
 pub mod widgets;

@@ -53,3 +53,12 @@ impl<C: piet::RenderContext + ?Sized> Backend for PietBackend<'_, C> {
     type Error = piet::Error;
     type Output = ();
 }
+
+/// Utility function for drawing a box based off of a theme class.
+pub(crate) fn draw_rectangle(
+    rc: &mut (impl piet::RenderContext + ?Sized),
+    theme: &ui_theme::WidgetProperties,
+    rectangle: crate::Rectangle
+) -> Result<(), piet::Error> {
+    todo!()
+}
