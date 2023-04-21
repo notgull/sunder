@@ -35,7 +35,22 @@ License along with `sunder`. If not, see <https://www.gnu.org/licenses/>.
 use core::fmt;
 
 #[cfg(feature = "piet")]
-pub mod piet;
+macro_rules! cfg_piet {
+    ($($i:item)*) => {
+        $($i)*
+    };
+}
+
+#[cfg(not(feature = "piet"))]
+macro_rules! cfg_piet {
+    ($($i:item)*) => {};
+}
+
+cfg_piet! {
+    extern crate alloc;
+
+    pub mod piet;
+}
 
 pub mod widgets;
 
@@ -48,37 +63,39 @@ pub trait Backend {
     type Output;
 }
 
-/// The whole point.
-pub trait Widget<B: Backend> {
-    /// Persistent state of the widget.
-    ///
-    /// This part is usually consistent between calls. A retained mode GUI might store this in an
-    /// object alongside the widget, while an immediate mode GUI might derive this from the parameters
-    /// of whatever type defines the widget.
-    type Persistent<'a>: 'a;
-
+/// The widget information independent of the backend.
+pub trait Widget {
     /// Immediate state of the widget.
     ///
     /// This is expected to change between calls, often in response to user input. This might contain
     /// fields like "is the button pressed".
+    ///
+    /// This type is intended to be maintained by the GUI framework in response to events.
     type Immediate<'a>: Default + 'a;
 
-    /// Get the rectangle that this widget is defined by.
-    fn rectangle(&self, persistent: &mut Self::Persistent<'_>) -> Rectangle;
+    /// Reply to an event in the immediate state.
+    ///
+    /// Returns true if this change means that the widget needs to be redrawn.
+    fn handle_event(&mut self, immediate: &mut Self::Immediate<'_>, event: Event) -> bool;
+}
 
-    /// Add to the immediate state using an event.
-    fn event(
-        &self,
-        persistent: &mut Self::Persistent<'_>,
-        immediate: &mut Self::Immediate<'_>,
-        event: Event,
-    );
+/// The whole point.
+pub trait RenderedWidget<B: Backend>: Widget {
+    /// Backend-specific state of the widget.
+    ///
+    /// This can be used in some cases as a cache to avoid recomputing the widget's properties.
+    type Cache: Default;
+
+    /// Get the rectangle that this widget is defined by.
+    ///
+    /// Widgets are drawn at (0, 0).
+    fn rectangle(&mut self, cache: &mut Self::Cache, backend: &mut B) -> Result<Size, B::Error>;
 
     /// Render the widget.
     fn render(
         &self,
-        persistent: &Self::Persistent<'_>,
         immediate: &Self::Immediate<'_>,
+        cache: &mut Self::Cache,
         backend: &mut B,
     ) -> Result<B::Output, B::Error>;
 }
@@ -104,5 +121,15 @@ pub struct Rectangle {
     pub width: u32,
 
     /// The height of the rectangle.
+    pub height: u32,
+}
+
+/// Two dimensional size.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct Size {
+    /// The width of the size.
+    pub width: u32,
+
+    /// The height of the size.
     pub height: u32,
 }

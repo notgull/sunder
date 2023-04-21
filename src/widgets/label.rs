@@ -19,51 +19,100 @@ License along with `sunder`. If not, see <https://www.gnu.org/licenses/>.
 
 //! A text label.
 
-use crate::Widget;
-use core::marker::PhantomData;
+use crate::{RenderedWidget, Widget};
 
-#[cfg(feature = "piet")]
-use {crate::piet::PietBackend, piet::RenderContext};
-
-pub struct Label {
-    _private: (),
+cfg_piet! {
+    use crate::piet::PietBackend;
+    use piet::{RenderContext, TextLayout, Text, TextLayoutBuilder};
 }
 
-pub struct LabelState<'a> {
+/// A label consisting of text.
+///
+/// This widget is the atomic unit used to render text.
+pub struct Label<'a> {
     /// The text to display.
     text: &'a str,
+
+    /// The maximum width of the label.
+    max_width: Option<f64>,
     // TODO: Other text properties
 }
 
-impl Label {
-    pub fn new() -> Self {
-        Self { _private: () }
+cfg_piet! {
+    pub struct LabelCachePiet<R: RenderContext + ?Sized> {
+        /// Text layout.
+        layout: Option<R::TextLayout>,
+    }
+
+    impl<R: RenderContext + ?Sized> Default for LabelCachePiet<R> {
+        fn default() -> Self {
+            Self { layout: None }
+        }
+    }
+
+    impl<R: RenderContext + ?Sized> LabelCachePiet<R> {
+        fn populate(&mut self, label: &Label<'_>, ctx: &mut R) -> Result<(), piet::Error> {
+            use alloc::string::ToString;
+
+            if let Some(layout) = &self.layout {
+                if layout.text() == label.text {
+                    // No need to change anything.
+                    return Ok(());
+                }
+            }
+
+            // Build the text layout.
+            let mut layout = ctx
+                .text()
+                .new_text_layout(label.text.to_string());
+            if let Some(max_width) = label.max_width {
+                layout = layout.max_width(max_width);
+            }
+
+            self.layout = Some(layout.build()?);
+            Ok(())
+        }
+    }
+}
+
+impl Widget for Label<'_> {
+    type Immediate<'a> = ();
+
+    fn handle_event(&mut self, _immediate: &mut Self::Immediate<'_>, _event: crate::Event) -> bool {
+        // We don't care about events.
+        false
     }
 }
 
 #[cfg(feature = "piet")]
-impl<R: RenderContext + ?Sized> Widget<PietBackend<'_, R>> for Label {
-    type Persistent<'a> = LabelState<'a>;
-    type Immediate<'a> = ();
+impl<R: RenderContext + ?Sized> RenderedWidget<PietBackend<'_, R>> for Label<'_> {
+    type Cache = LabelCachePiet<R>;
 
-    fn event(
-        &self,
-        _persistent: &mut Self::Persistent<'_>,
-        _immediate: &mut Self::Immediate<'_>,
-        _event: crate::Event,
-    ) {
-    }
+    fn rectangle(
+        &mut self,
+        cache: &mut Self::Cache,
+        backend: &mut PietBackend<'_, R>,
+    ) -> Result<crate::Size, piet::Error> {
+        cache.populate(self, backend.context())?;
 
-    fn rectangle(&self, persistent: &mut Self::Persistent<'_>) -> crate::Rectangle {
-        todo!()
+        let size = cache.layout.as_ref().unwrap().size();
+        Ok(crate::Size {
+            width: size.width as u32,
+            height: size.height as u32,
+        })
     }
 
     fn render(
         &self,
-        persistent: &Self::Persistent<'_>,
-        _immediate: &Self::Immediate<'_>,
+        _: &(),
+        cache: &mut Self::Cache,
         backend: &mut PietBackend<'_, R>,
     ) -> Result<(), piet::Error> {
-        todo!()
+        cache.populate(self, backend.context())?;
+        backend
+            .context()
+            .draw_text(cache.layout.as_ref().unwrap(), (0.0, 0.0));
+
+        Ok(())
     }
 }
