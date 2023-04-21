@@ -19,6 +19,51 @@ License along with `sunder`. If not, see <https://www.gnu.org/licenses/>.
 
 //! A text label.
 
+use crate::Widget;
+use core::marker::PhantomData;
+
+#[cfg(feature = "piet")]
+use {crate::piet::PietBackend, piet::RenderContext};
+
 pub struct Label {
-    _private: ()
+    _private: (),
+}
+
+pub struct LabelState<'a> {
+    /// The text to display.
+    text: &'a str,
+    // TODO: Other text properties
+}
+
+impl Label {
+    pub fn new() -> Self {
+        Self { _private: () }
+    }
+}
+
+#[cfg(feature = "piet")]
+impl<R: RenderContext + ?Sized> Widget<PietBackend<'_, R>> for Label {
+    type Persistent<'a> = LabelState<'a>;
+    type Immediate<'a> = ();
+
+    fn event(
+        &self,
+        _persistent: &mut Self::Persistent<'_>,
+        _immediate: &mut Self::Immediate<'_>,
+        _event: crate::Event,
+    ) {
+    }
+
+    fn rectangle(&self, persistent: &mut Self::Persistent<'_>) -> crate::Rectangle {
+        todo!()
+    }
+
+    fn render(
+        &self,
+        persistent: &Self::Persistent<'_>,
+        _immediate: &Self::Immediate<'_>,
+        backend: &mut PietBackend<'_, R>,
+    ) -> Result<(), piet::Error> {
+        todo!()
+    }
 }

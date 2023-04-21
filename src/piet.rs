@@ -20,8 +20,9 @@ License along with `sunder`. If not, see <https://www.gnu.org/licenses/>.
 //! A backend for rendering widgets to a `piet` context.
 
 use super::Backend;
-
 use ui_theme::Theme;
+
+pub use piet;
 
 /// A backend oriented around a [`piet::RenderContext`].
 ///

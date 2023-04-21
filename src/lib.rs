@@ -51,34 +51,34 @@ pub trait Backend {
 /// The whole point.
 pub trait Widget<B: Backend> {
     /// Persistent state of the widget.
-    /// 
+    ///
     /// This part is usually consistent between calls. A retained mode GUI might store this in an
     /// object alongside the widget, while an immediate mode GUI might derive this from the parameters
     /// of whatever type defines the widget.
-    type Persistent;
+    type Persistent<'a>: 'a;
 
     /// Immediate state of the widget.
-    /// 
+    ///
     /// This is expected to change between calls, often in response to user input. This might contain
     /// fields like "is the button pressed".
-    type Immediate: Default;
+    type Immediate<'a>: Default + 'a;
 
     /// Get the rectangle that this widget is defined by.
-    fn rectangle(&self, persistent: &mut Self::Persistent) -> Rectangle;
+    fn rectangle(&self, persistent: &mut Self::Persistent<'_>) -> Rectangle;
 
     /// Add to the immediate state using an event.
     fn event(
         &self,
-        persistent: &mut Self::Persistent,
-        immediate: &mut Self::Immediate,
+        persistent: &mut Self::Persistent<'_>,
+        immediate: &mut Self::Immediate<'_>,
         event: Event,
     );
 
     /// Render the widget.
     fn render(
         &self,
-        persistent: &Self::Persistent,
-        immediate: &Self::Immediate,
+        persistent: &Self::Persistent<'_>,
+        immediate: &Self::Immediate<'_>,
         backend: &mut B,
     ) -> Result<B::Output, B::Error>;
 }
