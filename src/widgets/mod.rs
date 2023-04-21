@@ -22,4 +22,5 @@ License along with `sunder`. If not, see <https://www.gnu.org/licenses/>.
 mod button;
 mod text_view;
 
+pub use button::PushButton;
 pub use text_view::TextView;

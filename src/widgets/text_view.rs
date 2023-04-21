@@ -128,7 +128,7 @@ cfg_web! {
             _backend: &mut crate::web::HtmlBackend,
         ) -> Result<crate::Size, crate::web::Error> {
             // TODO
-            Ok(crate::Size { width: 0, height: 0 }) 
+            Ok(crate::Size { width: 0, height: 0 })
         }
 
         fn render(

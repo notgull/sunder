@@ -19,4 +19,66 @@ License along with `sunder`. If not, see <https://www.gnu.org/licenses/>.
 
 //! A push button with text inside.
 
-// TODO
+use super::text_view::{TextView, TextViewCachePiet};
+use crate::{RenderedWidget, Size, Widget};
+
+cfg_piet! {
+  use crate::piet::PietBackend;
+  use piet::RenderContext;
+}
+
+/// A push button with text inside.
+pub struct PushButton<'a> {
+    text: TextView<'a>,
+    size: Size,
+}
+
+#[derive(Default)]
+pub struct PushButtonImmediateState {
+    /// Whether the button is currently pressed.
+    pressed: bool,
+}
+
+cfg_piet! {
+  pub struct PushButtonCachePiet<R: RenderContext + ?Sized> {
+    text: TextViewCachePiet<R>,
+  }
+
+  impl<R: RenderContext + ?Sized> Default for PushButtonCachePiet<R> {
+    fn default() -> Self {
+      Self {
+        text: Default::default(),
+      }
+    }
+  }
+}
+
+impl Widget for PushButton<'_> {
+    type Immediate<'a> = PushButtonImmediateState;
+
+    fn handle_event(&mut self, immediate: &mut Self::Immediate<'_>, event: crate::Event) -> bool {
+        todo!()
+    }
+}
+
+#[cfg(feature = "piet")]
+impl<R: RenderContext + ?Sized> RenderedWidget<PietBackend<'_, R>> for PushButton<'_> {
+    type Cache = PushButtonCachePiet<R>;
+
+    fn rectangle(
+        &mut self,
+        cache: &mut Self::Cache,
+        backend: &mut PietBackend<'_, R>,
+    ) -> Result<Size, <PietBackend<'_, R> as crate::Backend>::Error> {
+        todo!()
+    }
+
+    fn render(
+        &self,
+        immediate: &Self::Immediate<'_>,
+        cache: &mut Self::Cache,
+        backend: &mut PietBackend<'_, R>,
+    ) -> Result<(), piet::Error> {
+        todo!()
+    }
+}
