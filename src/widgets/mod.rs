@@ -19,8 +19,8 @@ License along with `sunder`. If not, see <https://www.gnu.org/licenses/>.
 
 //! A collection of predefined widgets.
 
-mod button;
-mod text_view;
+pub mod button;
+pub mod text_view;
 
 pub use button::PushButton;
 pub use text_view::TextView;

@@ -39,18 +39,18 @@ pub struct TextView<'a> {
 }
 
 cfg_piet! {
-    pub struct TextViewCachePiet<R: RenderContext + ?Sized> {
+    pub struct PietCache<R: RenderContext + ?Sized> {
         /// Text layout.
         layout: Option<R::TextLayout>,
     }
 
-    impl<R: RenderContext + ?Sized> Default for TextViewCachePiet<R> {
+    impl<R: RenderContext + ?Sized> Default for PietCache<R> {
         fn default() -> Self {
             Self { layout: None }
         }
     }
 
-    impl<R: RenderContext + ?Sized> TextViewCachePiet<R> {
+    impl<R: RenderContext + ?Sized> PietCache<R> {
         fn populate(&mut self, label: &TextView<'_>, ctx: &mut R) -> Result<(), piet::Error> {
             use alloc::string::ToString;
 
@@ -87,7 +87,7 @@ impl Widget for TextView<'_> {
 
 #[cfg(feature = "piet")]
 impl<R: RenderContext + ?Sized> RenderedWidget<PietBackend<'_, R>> for TextView<'_> {
-    type Cache = TextViewCachePiet<R>;
+    type Cache = PietCache<R>;
 
     fn rectangle(
         &mut self,

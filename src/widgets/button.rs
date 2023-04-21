@@ -19,7 +19,7 @@ License along with `sunder`. If not, see <https://www.gnu.org/licenses/>.
 
 //! A push button with text inside.
 
-use super::text_view::{TextView, TextViewCachePiet};
+use super::text_view::{TextView, PietCache as TextPietCache};
 use crate::{RenderedWidget, Size, Widget};
 
 cfg_piet! {
@@ -34,17 +34,17 @@ pub struct PushButton<'a> {
 }
 
 #[derive(Default)]
-pub struct PushButtonImmediateState {
+pub struct ImmediateState {
     /// Whether the button is currently pressed.
     pressed: bool,
 }
 
 cfg_piet! {
-  pub struct PushButtonCachePiet<R: RenderContext + ?Sized> {
-    text: TextViewCachePiet<R>,
+  pub struct PietCache<R: RenderContext + ?Sized> {
+    text: TextPietCache<R>,
   }
 
-  impl<R: RenderContext + ?Sized> Default for PushButtonCachePiet<R> {
+  impl<R: RenderContext + ?Sized> Default for PietCache<R> {
     fn default() -> Self {
       Self {
         text: Default::default(),
@@ -54,7 +54,7 @@ cfg_piet! {
 }
 
 impl Widget for PushButton<'_> {
-    type Immediate<'a> = PushButtonImmediateState;
+    type Immediate<'a> = ImmediateState;
 
     fn handle_event(&mut self, immediate: &mut Self::Immediate<'_>, event: crate::Event) -> bool {
         todo!()
@@ -63,7 +63,7 @@ impl Widget for PushButton<'_> {
 
 #[cfg(feature = "piet")]
 impl<R: RenderContext + ?Sized> RenderedWidget<PietBackend<'_, R>> for PushButton<'_> {
-    type Cache = PushButtonCachePiet<R>;
+    type Cache = PietCache<R>;
 
     fn rectangle(
         &mut self,
