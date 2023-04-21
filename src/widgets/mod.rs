@@ -20,4 +20,6 @@ License along with `sunder`. If not, see <https://www.gnu.org/licenses/>.
 //! A collection of predefined widgets.
 
 mod button;
-mod label;
+mod text_view;
+
+pub use text_view::TextView;

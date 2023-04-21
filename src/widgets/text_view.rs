@@ -29,7 +29,7 @@ cfg_piet! {
 /// A label consisting of text.
 ///
 /// This widget is the atomic unit used to render text.
-pub struct Label<'a> {
+pub struct TextView<'a> {
     /// The text to display.
     text: &'a str,
 
@@ -39,19 +39,19 @@ pub struct Label<'a> {
 }
 
 cfg_piet! {
-    pub struct LabelCachePiet<R: RenderContext + ?Sized> {
+    pub struct TextViewCachePiet<R: RenderContext + ?Sized> {
         /// Text layout.
         layout: Option<R::TextLayout>,
     }
 
-    impl<R: RenderContext + ?Sized> Default for LabelCachePiet<R> {
+    impl<R: RenderContext + ?Sized> Default for TextViewCachePiet<R> {
         fn default() -> Self {
             Self { layout: None }
         }
     }
 
-    impl<R: RenderContext + ?Sized> LabelCachePiet<R> {
-        fn populate(&mut self, label: &Label<'_>, ctx: &mut R) -> Result<(), piet::Error> {
+    impl<R: RenderContext + ?Sized> TextViewCachePiet<R> {
+        fn populate(&mut self, label: &TextView<'_>, ctx: &mut R) -> Result<(), piet::Error> {
             use alloc::string::ToString;
 
             if let Some(layout) = &self.layout {
@@ -75,7 +75,7 @@ cfg_piet! {
     }
 }
 
-impl Widget for Label<'_> {
+impl Widget for TextView<'_> {
     type Immediate<'a> = ();
 
     fn handle_event(&mut self, _immediate: &mut Self::Immediate<'_>, _event: crate::Event) -> bool {
@@ -86,8 +86,8 @@ impl Widget for Label<'_> {
 }
 
 #[cfg(feature = "piet")]
-impl<R: RenderContext + ?Sized> RenderedWidget<PietBackend<'_, R>> for Label<'_> {
-    type Cache = LabelCachePiet<R>;
+impl<R: RenderContext + ?Sized> RenderedWidget<PietBackend<'_, R>> for TextView<'_> {
+    type Cache = TextViewCachePiet<R>;
 
     fn rectangle(
         &mut self,
@@ -119,7 +119,7 @@ impl<R: RenderContext + ?Sized> RenderedWidget<PietBackend<'_, R>> for Label<'_>
 }
 
 cfg_web! {
-    impl RenderedWidget<crate::web::HtmlBackend> for Label<'_> {
+    impl RenderedWidget<crate::web::HtmlBackend> for TextView<'_> {
         type Cache = ();
 
         fn rectangle(
