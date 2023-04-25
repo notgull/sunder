@@ -19,11 +19,12 @@ License along with `sunder`. If not, see <https://www.gnu.org/licenses/>.
 
 //! A push button with text inside.
 
-use super::text_view::{TextView, PietCache as TextPietCache};
+use super::text_view::TextView;
 use crate::{RenderedWidget, Size, Widget};
 
 cfg_piet! {
   use crate::piet::PietBackend;
+  use super::text_view::PietCache as TextPietCache;
   use piet::RenderContext;
 }
 
